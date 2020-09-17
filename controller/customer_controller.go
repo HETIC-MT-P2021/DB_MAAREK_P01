@@ -7,15 +7,12 @@ import (
 	"net/http"
 )
 
-func GetCustomerRecord(c *gin.Context) {
-	repo.QueryAllCustomers()
-
-	c.JSON(http.StatusOK, "Shalom")
-}
-
 func GetCustomerRecordById(c *gin.Context) {
-	id := util.ConvertStringToInt(c.Param("id"))
-	cm := repo.QueryCustomerById(id)
+	id := util.ParseStringToUint64(c.Param("id"))
+	cm, err := repo.QueryCustomerById(id)
+	if err != nil {
+		c.JSON(http.StatusNoContent, "No content found")
+	}
 
 	c.JSON(http.StatusOK, cm)
 }

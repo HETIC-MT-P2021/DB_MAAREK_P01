@@ -7,44 +7,11 @@ import (
 	"github.com/JackMaarek/DS/util"
 )
 
-func QueryAllCustomers() {
-	results, err := conf.DB.Query("SELECT * FROM customers")
-	if err != nil {
-		fmt.Println(err.Error()) // proper error handling instead of panic in your app
-		return
-	}
-
-	for results.Next() {
-		var c models.Customer
-		// for each row, scan the result into our tag composite object
-		err = results.Scan(
-			&c.CustomerNumber,
-			&c.CustomerName,
-			&c.ContactLastName,
-			&c.ContactFirstName,
-			&c.Phone,
-			&c.AddressLine1,
-			&c.AddressLine2,
-			&c.City,
-			&c.State,
-			&c.PostalCode,
-			&c.Country,
-			&c.SalesRepEmployeeNumber,
-			&c.CreditLimit,
-		)
-		if err != nil {
-			fmt.Println(err.Error()) // proper error handling instead of panic in your app
-		}
-		// and then print out the tag's Name attribute
-		fmt.Println(c)
-	}
-}
-
-func QueryCustomerById(id uint64) *models.Customer {
+func QueryCustomerById(id uint64) (*models.Customer, error) {
 	results, err := conf.DB.Query("SELECT * FROM customers where customerNumber = ?", id)
 	if err != nil {
 		fmt.Println(err.Error()) // proper error handling instead of panic in your app
-		return &models.Customer{}
+		return &models.Customer{}, err
 	}
 	var (
 		CustomerNumber         uint64
@@ -81,6 +48,7 @@ func QueryCustomerById(id uint64) *models.Customer {
 		)
 		if err != nil {
 			fmt.Println(err.Error()) // proper error handling instead of panic in your app
+			return &models.Customer{}, err
 		}
 	}
 	c := models.Customer{
@@ -98,5 +66,5 @@ func QueryCustomerById(id uint64) *models.Customer {
 		SalesRepEmployeeNumber: SalesRepEmployeeNumber,
 		CreditLimit:            CreditLimit,
 	}
-	return &c
+	return &c, nil
 }

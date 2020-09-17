@@ -6,6 +6,32 @@ import (
 )
 
 func SetupRouter(router *gin.Engine) {
-	router.GET("/customers", controller.GetCustomerRecord)
-	router.GET("/customers/:id", controller.GetCustomerRecordById)
+	apiV1 := router.Group("/v1")
+
+	// -------- Customers -----------
+	customers := apiV1.Group("/customers")
+
+	customers.GET("/:id", controller.GetCustomerRecordById)
+	customers.GET("/:id/orders", controller.GetOrdersRecordByCustomer)
+
+	// -------- End Customers -----------
+
+	// -------- Orders -----------
+	orders := apiV1.Group("/orders")
+
+	orders.GET("/:id", controller.GetOrdersRecordById)
+	orders.GET("/:id/details", controller.GetOrdersDetailsRecordById)
+
+	// -------- End Orders -----------
+
+	// -------- Employees -----------
+	employees := apiV1.Group("/employees")
+
+	employees.GET("/:id")
+
+	// -------- End Orders -----------
+
+	offices := apiV1.Group("/offices")
+
+	offices.GET("/:id")
 }

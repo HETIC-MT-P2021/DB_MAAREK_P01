@@ -18,21 +18,32 @@ type DbConfig struct {
 
 var DB *sql.DB
 
-func InitializeDb(user string, password string, host string, name string, port int) {
-	var err error
+func InitializeDb(user string, password string, host string, name string, port int) error {
+	var dbErr error
 	dbURL := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local", user, password, host, port, name)
-	DB, err = sql.Open("mysql", dbURL)
+	db, err := sql.Open("mysql", dbURL)
 	if err != nil {
 		fmt.Printf("Cannot connect to database")
 		log.Fatal("error:", err)
+		return err
 	}
-	if err = DB.Ping(); err != nil {
-		fmt.Println("DB dead")
+	for i := 1; i <= 8; i++ {
+		dbErr = db.Ping()
+		if dbErr != nil {
+			if i < 8 {
+				log.Printf("db connection failed, %d retry : %v", i, dbErr)
+				time.Sleep(10 * time.Second)
+			}
+			continue
+		}
+
+		break
 	}
 	DB.SetConnMaxLifetime(time.Minute * 3)
 	DB.SetMaxOpenConns(10)
 	DB.SetMaxIdleConns(10)
 	fmt.Printf("We are connected to database \n")
-
+	DB = db
 	//defer DB.Close()
+	return nil
 }
