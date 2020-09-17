@@ -1,0 +1,36 @@
+version: "3"
+
+services:
+  db:
+    image: mysql
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ds
+      MYSQL_USER: ds
+      MYSQL_PASSWORD: ds
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    ports:
+    - "3306:3306"
+  app:
+    env_file:
+      - .env.local
+    build: .
+    environment:
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: classicmodels
+    volumes:
+      - ".:/go/src"
+    ports:
+      - "8080:8080"
+    tty: true
+    links:
+      - db
+    depends_on:
+      - db
+    restart: always
