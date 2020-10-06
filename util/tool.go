@@ -25,10 +25,10 @@ func (ns *NullString) Scan(value interface{}) error {
 	return nil
 }
 
-func ParseStringToUint64(routeParam string) uint64 {
+func ParseStringToUint64(str string) uint64 {
 	var err error
 	var id uint64
-	id, err = strconv.ParseUint(routeParam, 10, 32)
+	id, err = strconv.ParseUint(str, 10, 32)
 	if err != nil {
 		return 0
 	}

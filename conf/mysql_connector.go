@@ -39,9 +39,9 @@ func InitializeDb(user string, password string, host string, name string, port i
 
 		break
 	}
-	DB.SetConnMaxLifetime(time.Minute * 3)
-	DB.SetMaxOpenConns(10)
-	DB.SetMaxIdleConns(10)
+	db.SetConnMaxLifetime(time.Minute * 3)
+	db.SetMaxOpenConns(10)
+	db.SetMaxIdleConns(10)
 	fmt.Printf("We are connected to database \n")
 	DB = db
 	//defer DB.Close()

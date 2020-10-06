@@ -37,7 +37,7 @@ func QueryOrdersByCustomerId(id uint64) (*[]models.PublicOrder, error) {
 		orders = append(orders, order)
 	}
 	if err != nil {
-		return &[]models.PublicOrder{}, err
+		return nil, err
 	}
 
 	return &orders, err
@@ -52,23 +52,18 @@ func QueryOrderById(id uint64) (*models.Order, error) {
 		ItemsNumber       uint64
 		TotalPrice        float64
 	)
-	rows, err := conf.DB.Query("SELECT o.orderNumber, o.orderDate , c.contactFirstName, c.contactLastName, SUM(od.quantityOrdered) AS 'Items number', SUM(od.priceEach * od.quantityOrdered) AS 'Total price' FROM orders o INNER JOIN customers c ON c.customerNumber = o.customerNumber INNER JOIN orderdetails od ON od.orderNumber = o.orderNumber WHERE o.orderNumber = ? GROUP BY o.orderNumber", id)
-	defer rows.Close()
+	row := conf.DB.QueryRow("SELECT o.orderNumber, o.orderDate , c.contactFirstName, c.contactLastName, SUM(od.quantityOrdered) AS 'Items number', SUM(od.priceEach * od.quantityOrdered) AS 'Total price' FROM orders o INNER JOIN customers c ON c.customerNumber = o.customerNumber INNER JOIN orderdetails od ON od.orderNumber = o.orderNumber WHERE o.orderNumber = ? GROUP BY o.orderNumber", id)
+
+	err := row.Scan(
+		&Number,
+		&Date,
+		&CustomerFirstName,
+		&CustomerLastName,
+		&ItemsNumber,
+		&TotalPrice,
+	)
 	if err != nil {
-		return &models.Order{}, err
-	}
-	for rows.Next() {
-		err = rows.Scan(
-			&Number,
-			&Date,
-			&CustomerFirstName,
-			&CustomerLastName,
-			&ItemsNumber,
-			&TotalPrice,
-		)
-	}
-	if err != nil {
-		return &models.Order{}, err
+		return nil, err
 	}
 
 	order := models.Order{
@@ -96,10 +91,10 @@ func QueryOrderDetailsByOrderNumber(number uint64) (*[]models.OrderDetails, erro
 
 	rows, err := conf.DB.Query("SELECT od.productCode,p.productName, p.productDescription, od.quantityOrdered, od.priceEach, (od.quantityOrdered*od.priceEach) FROM orders o INNER JOIN orderdetails od ON od.orderNumber = o.orderNumber INNER JOIN products p ON od.productCode = p.productCode WHERE o.orderNumber = ? ORDER BY od.orderLineNumber", number)
 
-	defer rows.Close()
 	if err != nil {
-		return &[]models.OrderDetails{}, err
+		return nil, err
 	}
+	defer rows.Close()
 	for rows.Next() {
 		err = rows.Scan(
 			&ProductCode,
@@ -121,7 +116,7 @@ func QueryOrderDetailsByOrderNumber(number uint64) (*[]models.OrderDetails, erro
 		orderDetails = append(orderDetails, orderDetail)
 	}
 	if err != nil {
-		return &[]models.OrderDetails{}, err
+		return nil, err
 	}
 
 	return &orderDetails, err

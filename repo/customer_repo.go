@@ -1,18 +1,14 @@
 package repo
 
 import (
-	"fmt"
 	"github.com/JackMaarek/DS/conf"
 	"github.com/JackMaarek/DS/models"
 	"github.com/JackMaarek/DS/util"
 )
 
 func QueryCustomerById(id uint64) (*models.Customer, error) {
-	results, err := conf.DB.Query("SELECT * FROM customers where customerNumber = ?", id)
-	if err != nil {
-		fmt.Println(err.Error()) // proper error handling instead of panic in your app
-		return &models.Customer{}, err
-	}
+	row := conf.DB.QueryRow("SELECT c.customerNumber, c.customerName, c.contactLastName, c.contactFirstName, c.phone, c.addressLine1, c.addressLine2, c.city, c.state, c.postalCode, c.country, c.salesRepEmployeeNumber, c.creditLimit FROM customers c where customerNumber = ?", id)
+
 	var (
 		CustomerNumber         uint64
 		CustomerName           string
@@ -29,28 +25,25 @@ func QueryCustomerById(id uint64) (*models.Customer, error) {
 		CreditLimit            float64
 	)
 
-	for results.Next() {
-		// for each row, scan the result into our tag composite object
-		err = results.Scan(
-			&CustomerNumber,
-			&CustomerName,
-			&ContactLastName,
-			&ContactFirstName,
-			&Phone,
-			&AddressLine1,
-			&AddressLine2,
-			&City,
-			&State,
-			&PostalCode,
-			&Country,
-			&SalesRepEmployeeNumber,
-			&CreditLimit,
-		)
-		if err != nil {
-			fmt.Println(err.Error()) // proper error handling instead of panic in your app
-			return &models.Customer{}, err
-		}
+	err := row.Scan(
+		&CustomerNumber,
+		&CustomerName,
+		&ContactLastName,
+		&ContactFirstName,
+		&Phone,
+		&AddressLine1,
+		&AddressLine2,
+		&City,
+		&State,
+		&PostalCode,
+		&Country,
+		&SalesRepEmployeeNumber,
+		&CreditLimit,
+	)
+	if err != nil {
+		return nil, err
 	}
+
 	c := models.Customer{
 		CustomerNumber:         CustomerNumber,
 		CustomerName:           CustomerName,

@@ -8,15 +8,16 @@ import (
 	"net/http"
 )
 
-func GetCustomerRecordById(c *gin.Context) {
+func GetEmployeeRecordById(c *gin.Context) {
 	var err error
-	var cm *models.Customer
+	var e *models.Employee
 	id := util.ParseStringToUint64(c.Param("id"))
 
-	cm, err = repo.QueryCustomerById(id)
+	e, err = repo.QueryEmployeeById(id)
 	if err != nil {
 		c.JSON(http.StatusNoContent, "")
 		return
 	}
-	c.JSON(http.StatusOK, cm)
+
+	c.JSON(http.StatusOK, e)
 }

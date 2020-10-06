@@ -13,7 +13,6 @@ func SetupRouter(router *gin.Engine) {
 
 	customers.GET("/:id", controller.GetCustomerRecordById)
 	customers.GET("/:id/orders", controller.GetOrdersRecordByCustomer)
-
 	// -------- End Customers -----------
 
 	// -------- Orders -----------
@@ -21,17 +20,18 @@ func SetupRouter(router *gin.Engine) {
 
 	orders.GET("/:id", controller.GetOrdersRecordById)
 	orders.GET("/:id/details", controller.GetOrdersDetailsRecordById)
-
 	// -------- End Orders -----------
 
 	// -------- Employees -----------
 	employees := apiV1.Group("/employees")
 
-	employees.GET("/:id")
+	employees.GET("/:id", controller.GetEmployeeRecordById)
+	// -------- End Employees -----------
 
-	// -------- End Orders -----------
-
+	// -------- Offices -----------
 	offices := apiV1.Group("/offices")
 
-	offices.GET("/:id")
+	offices.GET("/:id", controller.GetOfficeRecordById)
+	// -------- End Offices -----------
+
 }
