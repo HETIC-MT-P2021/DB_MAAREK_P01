@@ -6,5 +6,5 @@ WORKDIR /go/src
 COPY . .
 # Run command to nstall the dependencies
 RUN go mod download
-
+RUN go build -o main .
 EXPOSE 8080
